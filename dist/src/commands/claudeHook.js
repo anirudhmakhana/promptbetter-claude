@@ -1,12 +1,10 @@
 import { loadConfig, validateConfig } from '../config.js';
 import { normalizePromptFromHook, readRecentTurnsFromTranscript, transcriptPathFromHook } from '../core/context.js';
 import { readAllStdin } from '../utils/io.js';
-import { warn, info } from '../log.js';
 import { buildPreviewGateContext, isPromptBetterControlReply } from '../core/claudeWorkflow.js';
 export async function runClaudeHook() {
     const raw = await readAllStdin();
     if (!raw.trim()) {
-        info('Empty hook payload, passing through');
         return;
     }
     let payload;
@@ -14,18 +12,15 @@ export async function runClaudeHook() {
         payload = JSON.parse(raw);
     }
     catch {
-        warn('Invalid hook JSON payload, passing through');
         return;
     }
     const prompt = normalizePromptFromHook(payload);
     if (!prompt || !prompt.trim()) {
-        warn('Hook payload did not include prompt, passing through');
         return;
     }
     const config = await loadConfig();
     validateConfig(config);
     if (isPromptBetterControlReply(prompt)) {
-        info('Detected PromptBetter control reply, skipping additional context injection');
         return;
     }
     const transcriptPath = transcriptPathFromHook(payload);

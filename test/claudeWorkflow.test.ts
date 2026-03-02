@@ -13,9 +13,9 @@ test('buildPreviewGateContext includes confirmation controls', () => {
   assert.ok(context.includes('PB_ORIGINAL'));
   assert.ok(context.includes('PB_EDIT:'));
   assert.ok(context.includes('Proposed Prompt'));
-  assert.ok(context.includes('Technical prompt requirements'));
-  assert.ok(context.includes('Implementation Tasks (with exact file paths)'));
-  assert.ok(context.includes('Test Plan'));
+  assert.ok(context.includes('objective'));
+  assert.ok(context.includes('exact file paths'));
+  assert.ok(context.includes('Recent transcript context'));
 });
 
 test('isPromptBetterControlReply detects control commands', () => {
