@@ -15,36 +15,16 @@ test('config set writes toml and loadConfig merges defaults', async () => {
   const cfg = await loadConfig();
   assert.equal(cfg.context.turns, 5);
   assert.equal(cfg.privacy.persist_history, false);
-  assert.equal(cfg.provider, 'claude_workflow');
-  assert.equal(cfg.confirm_mode, 'auto_accept');
 
   const configPath = getConfigPath();
   const raw = await fs.readFile(configPath, 'utf8');
   assert.ok(raw.includes('[context]'));
+  assert.ok(!raw.includes('provider ='));
 });
 
-test('config set accepts confirm_mode values', async () => {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'pb-config-confirm-'));
+test('config set rejects removed keys like provider', async () => {
+  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'pb-config-invalid-'));
   process.env.HOME = home;
 
-  await setConfigValue('confirm_mode', 'always');
-  let cfg = await loadConfig();
-  assert.equal(cfg.confirm_mode, 'always');
-
-  await setConfigValue('confirm_mode', 'skip');
-  cfg = await loadConfig();
-  assert.equal(cfg.confirm_mode, 'skip');
-});
-
-test('config set accepts provider values', async () => {
-  const home = await fs.mkdtemp(path.join(os.tmpdir(), 'pb-config-provider-'));
-  process.env.HOME = home;
-
-  await setConfigValue('provider', 'openai');
-  let cfg = await loadConfig();
-  assert.equal(cfg.provider, 'openai');
-
-  await setConfigValue('provider', 'claude_workflow');
-  cfg = await loadConfig();
-  assert.equal(cfg.provider, 'claude_workflow');
+  await assert.rejects(() => setConfigValue('provider' as never, 'openai'));
 });

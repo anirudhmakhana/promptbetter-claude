@@ -1,7 +1,6 @@
 import { loadConfig, validateConfig } from '../config.js';
-import { improvePrompt } from '../core/rewrite.js';
 import { normalizePromptFromHook, readRecentTurnsFromTranscript, transcriptPathFromHook } from '../core/context.js';
-import { choosePromptVersion, readAllStdin } from '../utils/io.js';
+import { readAllStdin } from '../utils/io.js';
 import { warn, info } from '../log.js';
 import { buildPreviewGateContext, isPromptBetterControlReply } from '../core/claudeWorkflow.js';
 import type { ClaudeHookOutput } from '../types.js';
@@ -30,66 +29,20 @@ export async function runClaudeHook(): Promise<void> {
   const config = await loadConfig();
   validateConfig(config);
 
+  if (isPromptBetterControlReply(prompt)) {
+    info('Detected PromptBetter control reply, skipping additional context injection');
+    return;
+  }
+
   const transcriptPath = transcriptPathFromHook(payload);
   const turns = await readRecentTurnsFromTranscript(transcriptPath, config.context.turns);
 
-  if (config.provider === 'claude_workflow') {
-    if (isPromptBetterControlReply(prompt)) {
-      info('Detected PromptBetter control reply, skipping additional context injection');
-      return;
-    }
-
-    const additionalContext = buildPreviewGateContext({
-      prompt,
-      turns,
-      policy: config.rewrite.policy,
-    });
-    emitClaudeAdditionalContext(additionalContext);
-    return;
-  }
-
-  let rewritten = prompt;
-  let guardrailIssues: string[] = [];
-
-  try {
-    const result = await improvePrompt({
-      prompt,
-      turns,
-      config,
-    });
-    rewritten = result.rewritten;
-    guardrailIssues = result.guardrails.issues;
-  } catch (err: unknown) {
-    warn('Rewrite failed, passing through original prompt', {
-      error: err instanceof Error ? err.message : String(err),
-    });
-    return;
-  }
-
-  if (config.confirm_mode === 'skip') {
-    info('confirm_mode=skip, passing through original prompt');
-    return;
-  }
-
-  if (config.confirm_mode === 'auto_accept') {
-    emitClaudeAdditionalContext(rewritten);
-    return;
-  }
-
-  const decision = await choosePromptVersion({
-    original: prompt,
-    improved: rewritten,
-    guardrailIssues,
-    timeoutMs: 30000,
-    defaultMode: 'accept',
+  const additionalContext = buildPreviewGateContext({
+    prompt,
+    turns,
+    policy: config.rewrite.policy,
   });
-
-  if (decision.mode === 'skip') {
-    info('User skipped rewrite');
-    return;
-  }
-
-  emitClaudeAdditionalContext(decision.finalPrompt);
+  emitClaudeAdditionalContext(additionalContext);
 }
 
 function emitClaudeAdditionalContext(finalPrompt: string): void {

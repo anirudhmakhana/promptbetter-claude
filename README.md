@@ -20,13 +20,8 @@ promptbetter uninstall claude
 ## Configure
 
 ```bash
-# default provider is claude_workflow (no external API key required)
-promptbetter config set provider claude_workflow
 promptbetter config set rewrite.policy conservative
-
-# optional: if you want external rewriting instead
-promptbetter config set provider openai
-export OPENAI_API_KEY=...
+promptbetter config set context.turns 3
 ```
 
 ## Commands
@@ -46,14 +41,10 @@ At runtime, `promptbetter claude-hook`:
 
 1. Reads the hook JSON payload from stdin.
 2. Extracts the current prompt + up to 3 recent turns from transcript.
-3. For `provider=claude_workflow` (default), injects a transparent preview gate in Claude:
+3. Injects a transparent preview gate in Claude:
    - Claude shows a `Proposed Prompt` first
    - User must choose one of `PB_APPROVE`, `PB_ORIGINAL`, or `PB_EDIT: ...`
    - Claude executes only after explicit confirmation
-4. For `provider=openai`, rewrites via OpenAI and applies `confirm_mode`:
-   - `auto_accept` (default): automatically inject rewritten prompt
-   - `always`: asks user to `accept/edit/skip` when tty is available
-   - `skip`: bypass rewrite injection
-5. Emits `hookSpecificOutput.additionalContext` when accepted/auto-accepted.
+4. Emits `hookSpecificOutput.additionalContext`.
 
 If any step fails, the original prompt is passed through.

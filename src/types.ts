@@ -1,5 +1,3 @@
-export type ProviderKind = 'claude_workflow' | 'openai';
-export type ConfirmMode = 'always' | 'auto_accept' | 'skip';
 export type RewritePolicy = 'conservative' | 'balanced' | 'aggressive';
 export type Role = 'user' | 'assistant';
 
@@ -9,8 +7,6 @@ export interface Turn {
 }
 
 export interface PromptBetterConfig {
-  provider: ProviderKind;
-  confirm_mode: ConfirmMode;
   context: {
     turns: number;
   };
@@ -23,8 +19,6 @@ export interface PromptBetterConfig {
 }
 
 export type ConfigDotKey =
-  | 'provider'
-  | 'confirm_mode'
   | 'context.turns'
   | 'rewrite.policy'
   | 'privacy.persist_history';
@@ -39,8 +33,6 @@ export interface ImprovePromptInput {
   prompt: string;
   turns: Turn[];
   config: PromptBetterConfig;
-  env?: NodeJS.ProcessEnv;
-  fetchImpl?: typeof fetch;
 }
 
 export interface ImprovePromptResult {

@@ -16,24 +16,13 @@ export async function runDoctor(): Promise<void> {
   }
 
   const config = await loadConfig();
-  checks.push(ok(`Provider: ${config.provider}`));
-
-  if (config.provider === 'openai') {
-    checks.push(ok('OpenAI model: gpt-4.1-mini (internal default)'));
-    if (process.env.OPENAI_API_KEY) {
-      checks.push(ok('OPENAI_API_KEY present'));
-    } else {
-      checks.push(fail('OPENAI_API_KEY missing'));
-    }
-  } else {
-    checks.push(ok('Using Claude workflow provider (no external API key required)'));
-    const skillPath = path.join(process.cwd(), '.claude', 'skills', 'promptbetter-preview', 'SKILL.md');
-    try {
-      await fs.access(skillPath);
-      checks.push(ok(`Workspace skill found: ${skillPath}`));
-    } catch {
-      checks.push(warn(`Workspace skill missing: ${skillPath}`));
-    }
+  checks.push(ok('Mode: Claude workflow only (no external API key required)'));
+  const skillPath = path.join(process.cwd(), '.claude', 'skills', 'promptbetter-preview', 'SKILL.md');
+  try {
+    await fs.access(skillPath);
+    checks.push(ok(`Workspace skill found: ${skillPath}`));
+  } catch {
+    checks.push(warn(`Workspace skill missing: ${skillPath}`));
   }
 
   const settingsPath = getClaudeSettingsPath();

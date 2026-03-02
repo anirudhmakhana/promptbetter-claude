@@ -4,8 +4,6 @@ import os from 'node:os';
 import type { ConfigDotKey, JsonObject, PromptBetterConfig } from './types.js';
 
 export const DEFAULT_CONFIG: PromptBetterConfig = {
-  provider: 'claude_workflow',
-  confirm_mode: 'auto_accept',
   context: {
     turns: 3,
   },
@@ -18,8 +16,6 @@ export const DEFAULT_CONFIG: PromptBetterConfig = {
 };
 
 const ALLOWED_KEYS: ReadonlySet<ConfigDotKey> = new Set([
-  'provider',
-  'confirm_mode',
   'context.turns',
   'rewrite.policy',
   'privacy.persist_history',
@@ -65,14 +61,6 @@ export async function setConfigValue(dotKey: ConfigDotKey, value: string): Promi
 }
 
 export function validateConfig(config: PromptBetterConfig): void {
-  if (!['claude_workflow', 'openai'].includes(config.provider)) {
-    throw new Error(`Unsupported provider: ${config.provider}`);
-  }
-
-  if (!['always', 'auto_accept', 'skip'].includes(config.confirm_mode)) {
-    throw new Error(`Unsupported confirm_mode: ${config.confirm_mode}`);
-  }
-
   if (!['conservative', 'balanced', 'aggressive'].includes(config.rewrite.policy)) {
     throw new Error(`Unsupported rewrite.policy: ${config.rewrite.policy}`);
   }
@@ -138,9 +126,6 @@ function escapeToml(str: string): string {
 
 export function toToml(config: PromptBetterConfig): string {
   const lines: string[] = [];
-  lines.push(`provider = "${escapeToml(config.provider)}"`);
-  lines.push(`confirm_mode = "${escapeToml(config.confirm_mode)}"`);
-  lines.push('');
   lines.push('[context]');
   lines.push(`turns = ${config.context.turns}`);
   lines.push('');
@@ -155,8 +140,6 @@ export function toToml(config: PromptBetterConfig): string {
 
 function deepMerge(base: PromptBetterConfig, override: Partial<PromptBetterConfig>): PromptBetterConfig {
   return {
-    provider: override.provider ?? base.provider,
-    confirm_mode: override.confirm_mode ?? base.confirm_mode,
     context: {
       turns: override.context?.turns ?? base.context.turns,
     },
@@ -171,12 +154,6 @@ function deepMerge(base: PromptBetterConfig, override: Partial<PromptBetterConfi
 
 function setNested(config: PromptBetterConfig, dotKey: ConfigDotKey, value: string | number | boolean): void {
   switch (dotKey) {
-    case 'provider':
-      config.provider = String(value) as PromptBetterConfig['provider'];
-      return;
-    case 'confirm_mode':
-      config.confirm_mode = String(value) as PromptBetterConfig['confirm_mode'];
-      return;
     case 'context.turns':
       config.context.turns = Number(value);
       return;
