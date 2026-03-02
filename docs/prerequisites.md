@@ -21,14 +21,14 @@ Flow:
 
 Core files:
 
-- [claudeHook.ts](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/src/commands/claudeHook.ts)
-- [installClaude.ts](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/src/commands/installClaude.ts)
+- [claudeHook.ts](../src/commands/claudeHook.ts)
+- [installClaude.ts](../src/commands/installClaude.ts)
 
 ## 3) Workspace skill
 
 Prompt behavior guidance is in:
 
-- [SKILL.md](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/.claude/skills/promptbetter-preview/SKILL.md)
+- [SKILL.md](../.claude/skills/promptbetter-preview/SKILL.md)
 
 ## 4) Transparency controls
 

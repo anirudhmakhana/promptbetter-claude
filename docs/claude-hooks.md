@@ -51,9 +51,9 @@ If user input is already a control reply (`PB_*`), hook skips re-injection to av
 
 Implementation:
 
-- [claudeWorkflow.ts](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/src/core/claudeWorkflow.ts)
-- [claudeHook.ts](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/src/commands/claudeHook.ts)
-- [SKILL.md](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/.claude/skills/promptbetter-preview/SKILL.md)
+- [claudeWorkflow.ts](../src/core/claudeWorkflow.ts)
+- [claudeHook.ts](../src/commands/claudeHook.ts)
+- [SKILL.md](../.claude/skills/promptbetter-preview/SKILL.md)
 
 ## 4) Hook output contract
 

@@ -1,12 +1,6 @@
 # promptbetter
 
-Claude Code-first prompt rewriting CLI.
-
-## Documentation
-
-- Prerequisites and foundational concepts: [docs/prerequisites.md](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/docs/prerequisites.md)
-- Claude hook internals and payload/output details: [docs/claude-hooks.md](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/docs/claude-hooks.md)
-- System architecture and component map: [docs/architecture.md](/Users/anirudhmakhana/Documents/krsnalabs/promptbetter/docs/architecture.md)
+Claude Code plugin that adds a transparent prompt preview-and-approval gate before execution.
 
 ## Install locally
 
@@ -33,18 +27,43 @@ promptbetter doctor
 promptbetter uninstall claude
 ```
 
-## How Claude integration works
-
-`promptbetter install claude` adds a `UserPromptSubmit` hook in `~/.claude/settings.json`.
+## Claude Runtime Flow
 
 At runtime, `promptbetter claude-hook`:
 
-1. Reads the hook JSON payload from stdin.
-2. Extracts the current prompt + up to 3 recent turns from transcript.
-3. Injects a transparent preview gate in Claude:
-   - Claude shows a `Proposed Prompt` first
-   - User must choose one of `PB_APPROVE`, `PB_ORIGINAL`, or `PB_EDIT: ...`
-   - Claude executes only after explicit confirmation
-4. Emits `hookSpecificOutput.additionalContext`.
+1. Reads hook JSON from stdin.
+2. Extracts current prompt + recent transcript turns.
+3. Injects preview-gate context so Claude must show `Proposed Prompt` first.
+4. User explicitly chooses one control:
+- `PB_APPROVE`
+- `PB_ORIGINAL`
+- `PB_EDIT: ...`
+5. Claude executes only after explicit control input.
 
-If any step fails, the original prompt is passed through.
+## Plugin Distribution (Marketplace)
+
+This repo includes plugin metadata for marketplace distribution:
+
+- [claude-plugin.json](.claude-plugin/claude-plugin.json)
+- [marketplace.json](.claude-plugin/marketplace.json)
+- [.claude/settings.json](.claude/settings.json)
+
+Install via marketplace (once published):
+
+```bash
+claude plugin marketplace add anirudhmakhana/promptbetter-claude
+claude plugin install promptbetter@promptbetter-marketplace
+```
+
+Before publishing a release, build artifacts must exist:
+
+```bash
+npm run build
+```
+
+## Docs
+
+- [Prerequisites](docs/prerequisites.md)
+- [Claude Hooks](docs/claude-hooks.md)
+- [Architecture](docs/architecture.md)
+- [Release Guide](RELEASE.md)

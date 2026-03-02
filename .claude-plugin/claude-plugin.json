@@ -1,0 +1,9 @@
+{
+  "name": "promptbetter",
+  "description": "Preview and approve technical rewritten prompts before Claude executes.",
+  "version": "0.1.0",
+  "author": {
+    "name": "anirudhmakhana"
+  },
+  "license": "MIT"
+}
